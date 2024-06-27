@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.envers.Audited;
 
 import java.io.Serializable;
 
@@ -16,6 +17,7 @@ import java.io.Serializable;
 @Setter
 @SuperBuilder
 @DynamicInsert
+@Audited
 public abstract class Base implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

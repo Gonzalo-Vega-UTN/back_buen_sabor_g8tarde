@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.envers.Audited;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import java.util.Set;
 @ToString
 @SuperBuilder
 @Entity
+@Audited
 @JsonIgnoreProperties({"hibernateLazyInitializer","pedidos"})
 public class Cliente extends Base{
 

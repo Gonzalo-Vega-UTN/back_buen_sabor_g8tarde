@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.envers.Audited;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,6 +19,7 @@ import java.util.Set;
 @Entity
 @ToString(callSuper = true)
 @SuperBuilder
+@Audited
 @JsonIgnoreProperties({"hibernateLazyInitializer", "localidades","pais"})
 public class Provincia extends Base{
 

@@ -9,6 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.envers.Audited;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,6 +21,7 @@ import java.util.Set;
 @Entity
 @ToString(callSuper = true)
 @SuperBuilder
+@Audited
 @JsonIgnoreProperties({"hibernateLazyInitializer", "provincias"})
 public class Pais extends Base{
 

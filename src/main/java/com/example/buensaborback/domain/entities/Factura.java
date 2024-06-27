@@ -4,6 +4,7 @@ import com.example.buensaborback.domain.entities.enums.FormaPago;
 import jakarta.persistence.Entity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.envers.Audited;
 
 import java.time.LocalDate;
 
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @ToString
+@Audited
 @SuperBuilder
 public class Factura extends Base{
 

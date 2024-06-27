@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.envers.Audited;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -20,7 +21,7 @@ import java.util.Set;
 @Entity
 @ToString
 @SuperBuilder
-
+@Audited
 @JsonIgnoreProperties({"hibernateLazyInitializer","detallePedido","imagenes"})
 public class Promocion extends Base {
 

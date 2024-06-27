@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.envers.Audited;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.util.Objects;
@@ -16,6 +17,7 @@ import java.util.Objects;
 @Setter
 @Entity
 @SuperBuilder
+@Audited
 public class Imagen extends Base{
     private String url;
     private String name;

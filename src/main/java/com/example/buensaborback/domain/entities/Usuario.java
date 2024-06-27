@@ -11,6 +11,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToOne;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.envers.Audited;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,7 +20,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @ToString
 @SuperBuilder
-
+@Audited
 @JsonIgnoreProperties({"hibernateLazyInitializer", "cliente","empleado"})
 public class Usuario extends Base{
 

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.envers.Audited;
 
 import java.time.LocalTime;
 import java.util.HashSet;
@@ -18,7 +19,7 @@ import java.util.Set;
 @Setter
 @Entity
 @SuperBuilder
-
+@Audited
 @JsonIgnoreProperties({"hibernateLazyInitializer","categorias","pedidos","promociones","imagenSucursal"})
 public class Sucursal extends Base{
 

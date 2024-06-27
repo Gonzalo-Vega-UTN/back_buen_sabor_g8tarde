@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.envers.Audited;
 
 import java.util.Objects;
 
@@ -16,7 +17,7 @@ import java.util.Objects;
 @Entity
 @ToString
 @SuperBuilder
-
+@Audited
 @JsonIgnoreProperties({"hibernateLazyInitializer", "articuloManufacturado"})
 public class ArticuloManufacturadoDetalle extends Base {
     private Double cantidad;
