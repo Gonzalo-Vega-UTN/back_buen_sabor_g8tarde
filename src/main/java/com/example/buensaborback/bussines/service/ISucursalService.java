@@ -14,5 +14,7 @@ public interface ISucursalService {
     Sucursal updateSucursal(Long id, Sucursal sucursal);
     void deleteSucursal(Long id);
     List<Sucursal> getSucursalesByEmpresaId(Long empresaId);
+
+    List<Sucursal> getSucursalesByIds(List<Long> ids);
     Set<Imagen> uploadImages(MultipartFile[] files, Long id);
 }

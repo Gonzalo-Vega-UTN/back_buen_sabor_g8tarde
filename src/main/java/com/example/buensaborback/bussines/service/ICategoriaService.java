@@ -15,11 +15,9 @@ public interface ICategoriaService {
     List<Categoria> findAllBySucursal(Long id);
     List<Categoria> findAllCategoriasPadre();
     List<Categoria> findAllAlta();
-    Categoria update(Long id, Categoria body);
-    Categoria create(Long idPadre,Long idSucursal, Categoria body);
-    Categoria delete(Long id,Long idSucursal);
-
+    Categoria update(Long id, Categoria body, List<Long> sucursalesIds);
+    Categoria create(Long idPadre, Long idSucursal, Categoria body, List<Long> sucursalesIds);
+    Categoria delete(Long id, Long idSucursal);
     List<Categoria> findAllBySucu(Long id);
     Set<Imagen> uploadImages(MultipartFile[] files, Long id);
-
 }

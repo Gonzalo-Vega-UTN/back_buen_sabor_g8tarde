@@ -19,7 +19,7 @@ import java.util.Set;
 @ToString
 @SuperBuilder
 
-@JsonIgnoreProperties({"hibernateLazyInitializer", "sucursales","articulos"})
+@JsonIgnoreProperties({"hibernateLazyInitializer","articulos"})
 public class Categoria extends Base {
 
     private String denominacion;

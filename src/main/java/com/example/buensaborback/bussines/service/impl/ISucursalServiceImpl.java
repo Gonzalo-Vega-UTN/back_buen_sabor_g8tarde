@@ -60,6 +60,11 @@ public class ISucursalServiceImpl implements ISucursalService {
     }
 
     @Override
+    public List<Sucursal> getSucursalesByIds(List<Long> ids) {
+        return sucursalRepository.findAllById(ids);
+    }
+
+    @Override
     public Sucursal updateSucursal(Long id, Sucursal sucursal) {
        Sucursal existingSucursal = getSucursalById(id);
             Sucursal updatedSucursal = existingSucursal;
