@@ -3,23 +3,17 @@ package com.example.buensaborback.bussines.service.impl;
 import com.example.buensaborback.bussines.service.ICloudinaryService;
 import com.example.buensaborback.bussines.service.IEmpresaService;
 import com.example.buensaborback.bussines.service.IImagenService;
-import com.example.buensaborback.domain.entities.ArticuloInsumo;
+import com.example.buensaborback.domain.entities.Base;
 import com.example.buensaborback.domain.entities.Empresa;
 
 import com.example.buensaborback.domain.entities.Imagen;
-import com.example.buensaborback.presentation.advice.exception.BadRequestException;
-import com.example.buensaborback.presentation.advice.exception.DuplicateEntryException;
-import com.example.buensaborback.presentation.advice.exception.ImageUploadLimitException;
-import com.example.buensaborback.presentation.advice.exception.NotFoundException;
+import com.example.buensaborback.presentation.advice.exception.*;
 import com.example.buensaborback.repositories.EmpresaRepository;
 import com.example.buensaborback.repositories.ImagenRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -75,6 +69,9 @@ public class IEmpresaServiceImpl implements IEmpresaService {
         if (!empresa.getNombre().equalsIgnoreCase(existingEmpresa.getNombre())) {
             validateEmpresaNombre(empresa.getNombre());
         }
+        if(!empresa.isAlta() && existingEmpresa.isAlta()){
+
+        }
         existingEmpresa.setNombre(empresa.getNombre());
         existingEmpresa.setRazonSocial(empresa.getRazonSocial());
         existingEmpresa.setCuil(empresa.getCuil());
@@ -87,10 +84,14 @@ public class IEmpresaServiceImpl implements IEmpresaService {
     }
 
     @Override
-    public void deleteEmpresa(Long id) {
+    public Empresa changeStatus(Long id, boolean status) {
         Empresa empresa = this.getEmpresaById(id);
-        empresa.setAlta(!empresa.isAlta());
-        empresaRepository.save(empresa);
+        if(!status && empresa.getSucursales().stream().anyMatch(Base::isAlta)){
+            throw new EntityInUseException(String.format("No se puede dar de baja la empresa '%s' porque tiene sucursales activas asociadas.",
+                    empresa.getNombre()));
+        }
+        empresa.setAlta(status);
+       return empresaRepository.save(empresa);
     }
 
     @Override

@@ -49,12 +49,9 @@ public class SucursalController {
         return ResponseEntity.ok(updatedSucursal);
     }
 
-    @PutMapping("/baja/{id}")
-    public ResponseEntity<Void> bajaLogicaSucursal(@PathVariable Long id, @RequestParam boolean activo) {
-
-        sucursalService.bajaLogicaSucursal(id, activo);
-
-        return ResponseEntity.noContent().build();
+    @PatchMapping("/{id}")
+    public ResponseEntity<Sucursal> changeStatus(@PathVariable Long id, @RequestParam boolean status) {
+        return ResponseEntity.ok(sucursalService.changeStatus(id, status));
     }
 
     @GetMapping("/empresa/{empresaId}")

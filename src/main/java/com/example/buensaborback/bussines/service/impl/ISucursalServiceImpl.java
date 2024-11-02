@@ -1,20 +1,15 @@
 package com.example.buensaborback.bussines.service.impl;
 
 import com.example.buensaborback.bussines.service.*;
-import com.example.buensaborback.domain.entities.ArticuloInsumo;
+import com.example.buensaborback.domain.entities.Base;
 import com.example.buensaborback.domain.entities.Empresa;
 import com.example.buensaborback.domain.entities.Imagen;
 import com.example.buensaborback.domain.entities.Sucursal;
 
-import com.example.buensaborback.presentation.advice.exception.BadRequestException;
-import com.example.buensaborback.presentation.advice.exception.DuplicateEntryException;
-import com.example.buensaborback.presentation.advice.exception.ImageUploadLimitException;
-import com.example.buensaborback.presentation.advice.exception.NotFoundException;
+import com.example.buensaborback.presentation.advice.exception.*;
 import com.example.buensaborback.repositories.ImagenRepository;
 import com.example.buensaborback.repositories.SucursalRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.apache.velocity.exception.ResourceNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -92,14 +87,25 @@ public class ISucursalServiceImpl implements ISucursalService {
     }
 
     @Override
-    public void bajaLogicaSucursal(Long id, boolean activo) {
-        Optional<Sucursal> sucursalOpt = sucursalRepository.findById(id);
-        if (sucursalOpt.isPresent()) {
-            Sucursal sucursal = sucursalOpt.get();
-            sucursal.setAlta(activo);
-            sucursalRepository.save(sucursal);
-        } else {
-            throw new ResourceNotFoundException("Sucursal no encontrada con ID " + id);
+    public Sucursal changeStatus(Long id, boolean status) {
+        Sucursal existingSucursal = getSucursalById(id);
+        if (!status) checkForActiveEntities(existingSucursal);
+
+        existingSucursal.setAlta(status);
+        return sucursalRepository.save(existingSucursal);
+    }
+
+    private void checkForActiveEntities(Sucursal sucursal) {
+        long articulosActivos = sucursal.getArticulos().stream().filter(Base::isAlta).count();
+        if (articulosActivos > 0) {
+            String articuloMensaje = articulosActivos == 1 ? "1 artículo activo" : articulosActivos + " artículos activos";
+            throw new EntityInUseException(String.format("La sucursal '%s' tiene %s", sucursal.getNombre(), articuloMensaje));
+        }
+
+        long promocionesActivas = sucursal.getPromociones().stream().filter(Base::isAlta).count();
+        if (promocionesActivas > 0) {
+            String promocionMensaje = promocionesActivas == 1 ? "1 promoción activa" : promocionesActivas + " promociones activas";
+            throw new EntityInUseException(String.format("La sucursal '%s' tiene %s", sucursal.getNombre(), promocionMensaje));
         }
     }
 

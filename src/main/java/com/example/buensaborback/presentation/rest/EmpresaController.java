@@ -50,10 +50,9 @@ public class EmpresaController {
         return ResponseEntity.ok(updatedEmpresa);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEmpresa(@PathVariable Long id) {
-        empresaService.deleteEmpresa(id);
-        return ResponseEntity.noContent().build();
+    @PatchMapping("/{id}")
+    public ResponseEntity<Empresa> changeStatus(@PathVariable Long id, @RequestParam("status") boolean status) {
+        return ResponseEntity.ok(empresaService.changeStatus(id, status));
     }
 
     @PostMapping("/uploads")

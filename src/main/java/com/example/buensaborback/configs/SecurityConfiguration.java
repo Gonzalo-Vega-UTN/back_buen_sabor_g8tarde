@@ -93,6 +93,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/api/empresas/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/empresas").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/empresas/**").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/api/empresas/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/empresas/**").permitAll()
 
                         //Mercado Pago
@@ -129,6 +130,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, "/api/sucursales/{id}").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/sucursales/{id}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/sucursales/empresa/{empresaId}").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/api/sucursales/{id}**").permitAll()
 
                         //Unidad Medida
                         .requestMatchers(HttpMethod.GET, "/api/unidades-medida").permitAll()
@@ -161,7 +163,7 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(corsAllowedOrigins.split(",")));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setExposedHeaders(Arrays.asList("X-Get-Header"));

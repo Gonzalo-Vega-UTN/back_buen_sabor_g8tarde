@@ -14,7 +14,7 @@ public interface ISucursalService {
     Sucursal updateSucursal(Long id, Sucursal sucursal);
     List<Sucursal> getSucursalesByEmpresaId(Long empresaId);
 
-    void bajaLogicaSucursal(Long id, boolean activo);
+    Sucursal changeStatus(Long id, boolean status);
     List<Sucursal> getSucursalesByIds(List<Long> ids);
     Set<Imagen> uploadImages(MultipartFile[] files, Long id);
 }
