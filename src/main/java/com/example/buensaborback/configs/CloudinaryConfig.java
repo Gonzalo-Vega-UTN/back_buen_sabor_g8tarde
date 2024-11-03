@@ -31,9 +31,9 @@ public class CloudinaryConfig {
     @Bean
     @Profile("!local & !dev") // Para cualquier perfil que no sea "local" o "dev"
     public Cloudinary cloudinaryProperties(
-            @Value("${cloudinary.cloud_name}") String cloudName,
-            @Value("${cloudinary.api_key}") String apiKey,
-            @Value("${cloudinary.api_secret}") String apiSecret) {
+            @Value("${CLOUDINARY_CLOUD_NAME}") String cloudName,
+            @Value("${CLOUDINARY_API_KEY}") String apiKey,
+            @Value("${CLOUDINARY_SECRET}") String apiSecret) {
 
         return new Cloudinary(ObjectUtils.asMap(
                 "cloud_name", cloudName,
