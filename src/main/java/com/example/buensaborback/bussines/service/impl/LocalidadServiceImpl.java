@@ -36,4 +36,8 @@ public class LocalidadServiceImpl implements ILocalidadService {
     public boolean existLocalidadById(Long idLocalidad){
         return this.localidadRepository.existsById(idLocalidad);
     }
+
+    public List<Localidad> getAll(){
+        return this.localidadRepository.findAll();
+    }
 }

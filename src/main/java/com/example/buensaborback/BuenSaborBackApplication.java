@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 @SpringBootApplication
@@ -472,15 +473,20 @@ public class BuenSaborBackApplication {
     @Order(3)
     CommandLineRunner init3() {
         return args -> {
-            List<Domicilio> domicilios = this.domicilioRepository.findAll();
-            int i = 0;
-            for (Domicilio domicilio : domicilios){
-                Localidad localidad = this.localidadService.getLocalidadById(i+10L);
-                domicilio.setLocalidad(localidad);
-                localidad.getDomicilios().add(domicilio);
-                this.domicilioRepository.save(domicilio);
-                i += 10;
+            List<Localidad> localidades = this.localidadService.getAll();
+            if (!localidades.isEmpty()) {
+                List<Domicilio> domicilios = this.domicilioRepository.findAll();
+                for (Domicilio domicilio : domicilios){
+                    Random random = new Random();
+                    int randomIndex = random.nextInt(localidades.size());
+                    Localidad localidad = localidades.get(randomIndex);
+                    domicilio.setLocalidad(localidades.get(randomIndex));
+                    localidad.getDomicilios().add(domicilio);
+                    this.domicilioRepository.save(domicilio);
+                }
+
             }
+
 
         };
     }
