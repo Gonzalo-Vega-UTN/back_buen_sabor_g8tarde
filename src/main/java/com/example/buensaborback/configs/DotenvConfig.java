@@ -13,11 +13,11 @@ import org.springframework.core.env.Environment;
 
 @Configuration
 @Slf4j
+@Profile({"local", "dev"})
 public class DotenvConfig {
     @Value("${spring.profiles.active:default}")
     private String activeProfile;
     @Bean
-    @Profile({"local", "dev"})
     public Dotenv dotenv() {
         log.info("Cargando configuracion del perfil " + activeProfile);
         return Dotenv.configure()
