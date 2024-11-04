@@ -208,7 +208,7 @@ public class CategoriaServiceImpl implements ICategoriaService {
                 sucursal.getCategorias().remove(cat);
             });
         }
-        this.sucursalService.saveSucursal(sucursal);
+        this.sucursalService.updateSucursal(sucursal.getId(), sucursal);
         return this.categoriaRepository.save(categoria);
     }
 
