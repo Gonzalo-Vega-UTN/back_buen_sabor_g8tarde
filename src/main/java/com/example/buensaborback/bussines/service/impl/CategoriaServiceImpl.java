@@ -12,12 +12,15 @@ import com.example.buensaborback.presentation.advice.exception.ImageUploadLimitE
 import com.example.buensaborback.presentation.advice.exception.NotFoundException;
 import com.example.buensaborback.repositories.CategoriaRepository;
 import com.example.buensaborback.repositories.ImagenRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoriaServiceImpl implements ICategoriaService {
@@ -101,32 +104,53 @@ public class CategoriaServiceImpl implements ICategoriaService {
     }
 
 
-    private void actualizarRelacionSucursales2(Categoria categoria, List<Sucursal> nuevasSucursales){
-        //Quitar relaciones
-        List<Sucursal> sucursales = new ArrayList<>(categoria.getSucursales());
+    private void actualizarRelacionSucursales2(Categoria categoria, List<Sucursal> nuevasSucursales) {
+        // Verificar si hay variaciones entre la lista original y la nueva lista de sucursales
+        if (!new HashSet<>(categoria.getSucursales()).equals(new HashSet<>(nuevasSucursales))) {
+            // Obtener la lista de sucursales eliminadas
+            List<Sucursal> sucursalesEliminadas = getSucursalesEliminadas(new ArrayList<>(categoria.getSucursales()), nuevasSucursales);
 
-       for (Sucursal sucursal : sucursales){
-           categoria.getSucursales().removeIf(s -> s.getId().equals(sucursal.getId()));
-           sucursal.getCategorias().removeIf(c -> c.getId().equals(categoria.getId()));
-           if(!categoria.getSubCategorias().isEmpty()){
-               for (Categoria subCategoria : categoria.getSubCategorias()){
-                   subCategoria.getSucursales().removeIf(s -> s.getId().equals(sucursal.getId()));
-                   sucursal.getCategorias().removeIf(c -> c.getId().equals(subCategoria.getId()));
-               }
-           }
-       }
-        sucursales = new ArrayList<>(nuevasSucursales);
-        //Agregar relaciones
-        for (Sucursal sucursal : sucursales){
-            categoria.getSucursales().add(sucursal);
-            sucursal.getCategorias().add(categoria);
-            if(categoria.getCategoriaPadre() != null){
-                categoria.getCategoriaPadre().getSucursales().add(sucursal);
-                sucursal.getCategorias().add(categoria.getCategoriaPadre());
+            for (Sucursal sucursal : sucursalesEliminadas) {
+                // Eliminar la sucursal de la categoría actual
+                categoria.getSucursales().removeIf(s -> s.getId().equals(sucursal.getId()));
+                sucursal.getCategorias().removeIf(c -> c.getId().equals(categoria.getId()));
+
+                // Verificar y eliminar la sucursal de las subcategorías si está presente
+                for (Categoria subCategoria : categoria.getSubCategorias()) {
+                    if (subCategoria.getSucursales().removeIf(s -> s.getId().equals(sucursal.getId()))) {
+                        // Si se elimina de la subcategoría, eliminar la categoría de la lista de la sucursal
+                        sucursal.getCategorias().removeIf(c -> c.getId().equals(subCategoria.getId()));
+                    }
+                }
+            }
+
+            // Agregar nuevas relaciones de sucursales
+            for (Sucursal sucursal : nuevasSucursales) {
+                if (categoria.getSucursales().stream().noneMatch(s -> s.getId().equals(sucursal.getId()))) {
+                    categoria.getSucursales().add(sucursal);
+                    sucursal.getCategorias().add(categoria);
+
+                    // Si la categoría tiene una categoría padre, agregar la relación
+                    if (categoria.getCategoriaPadre() != null) {
+                        categoria.getCategoriaPadre().getSucursales().add(sucursal);
+                        sucursal.getCategorias().add(categoria.getCategoriaPadre());
+                    }
+                }
             }
         }
-
     }
+
+    public List<Sucursal> getSucursalesEliminadas(List<Sucursal> oldSucursales, List<Sucursal> newSucursales) {
+        Set<Long> nuevosIds = newSucursales.stream()
+                .map(Sucursal::getId)
+                .collect(Collectors.toSet());
+
+        return oldSucursales.stream()
+                .filter(sucursal -> !nuevosIds.contains(sucursal.getId()))
+                .collect(Collectors.toList());
+    }
+
+
     private Categoria actualizarRelacionSucursales(Categoria categoria, List<Sucursal> nuevasSucursales) {
         List<Sucursal> sucursalesAntiguas = new ArrayList<>(categoria.getSucursales());
 
