@@ -489,7 +489,23 @@ public class BuenSaborBackApplication {
 
 
         };
+
     }
+
+    @Bean
+    @Order(4)
+    CommandLineRunner init4() {
+        //adminr@gmail.com
+        //A123456!a
+        return args -> {
+            Usuario usuario = Usuario.builder().rol(Rol.Admin).email("adminr@gmail.com").alta(true).username("adminr").build();
+            usuarioRepository.save(usuario);
+        };
+
+
+    }
+
+
 
 
 }

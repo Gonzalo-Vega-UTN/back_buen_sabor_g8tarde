@@ -1,10 +1,16 @@
 package com.example.buensaborback.presentation.rest;
 
-import com.cloudinary.provisioning.Account;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.buensaborback.bussines.service.IUsuarioService;
+import com.example.buensaborback.domain.dto.Auth0User;
 import com.example.buensaborback.domain.entities.Usuario;
 import com.example.buensaborback.domain.entities.enums.Rol;
 import com.example.buensaborback.presentation.advice.exception.NotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +25,8 @@ import java.util.List;
 @RequestMapping("/api/auth")
 public class UsuarioController {
     private final IUsuarioService usuarioService;
+    @Value("${auth0.api.client.secret}")
+    private String secret;
 
     public UsuarioController(IUsuarioService usuarioService) {
         this.usuarioService = usuarioService;
@@ -28,6 +36,8 @@ public class UsuarioController {
     public ResponseEntity<?> login(@AuthenticationPrincipal Jwt jwt) {
         try {
             Usuario usuario = decodeToken(jwt);
+            System.out.println("REGISTER TOKEN");
+            System.out.println(usuario);
             Usuario usuarioLogueado = usuarioService.login(usuario);
             return ResponseEntity.ok().body(usuarioLogueado);
         } catch (Exception e) {
@@ -39,11 +49,19 @@ public class UsuarioController {
     public ResponseEntity<?> register(@AuthenticationPrincipal Jwt jwt) {
         try {
             Usuario usuario = decodeToken(jwt);
+            System.out.println("REGISTER TOKEN");
+            System.out.println(usuario);
             Usuario usuarioRegistrado = usuarioService.register(usuario);
             return ResponseEntity.status(HttpStatus.CREATED).body(usuarioRegistrado);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Error en el proceso de registro: " + e.getMessage()));
         }
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<?> createUser(
+            @RequestBody Auth0User body) {
+        return ResponseEntity.ok(usuarioService.createUser(body));
     }
 
     @GetMapping("/validar")

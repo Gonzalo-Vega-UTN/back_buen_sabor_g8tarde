@@ -84,4 +84,14 @@ public class RestControllerAdvice {
                 .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value())
                 .build(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
+
+    @ExceptionHandler(value = Auth0Exception.class)
+    public ResponseEntity<ErrorDto> handleAuth0Exception(Auth0Exception e){
+        String errorMsg = e.getClass().getSimpleName()+ " : " + e.getMessage();
+        logger.error(errorMsg);
+        return new ResponseEntity<>(ErrorDto.builder()
+                .message(e.getMessage())
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .build(), HttpStatus.BAD_REQUEST);
+    }
 }

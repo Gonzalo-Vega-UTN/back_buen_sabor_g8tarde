@@ -1,5 +1,6 @@
 package com.example.buensaborback.bussines.service;
 
+import com.example.buensaborback.domain.dto.Auth0User;
 import com.example.buensaborback.domain.entities.Cliente;
 import com.example.buensaborback.domain.entities.Usuario;
 import com.example.buensaborback.domain.entities.enums.Rol;
@@ -19,4 +20,5 @@ public interface IUsuarioService {
      List<Usuario> getAllUsuarios();
      List<Usuario> getUsuariosByRol(Rol rol);
      Usuario updateUsuarioRol(Long id, Rol newRol);
+     Usuario createUser(Auth0User body);
 }

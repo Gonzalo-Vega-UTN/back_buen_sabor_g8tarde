@@ -11,4 +11,6 @@ import lombok.*;
 public class ErrorDto {
     private String message;
     private int statusCode;
+    private String error;
+    private String errorCode;
 }

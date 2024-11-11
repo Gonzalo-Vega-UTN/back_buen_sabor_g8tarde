@@ -19,7 +19,7 @@ import java.util.Set;
 @Setter
 @Entity
 @SuperBuilder
-@JsonIgnoreProperties({"hibernateLazyInitializer", "usuario"})
+@JsonIgnoreProperties({"hibernateLazyInitializer"})
 public class Empleado extends Base {
     private String nombre;
     private String apellido;

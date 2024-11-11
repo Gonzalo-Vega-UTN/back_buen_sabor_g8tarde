@@ -1,24 +1,37 @@
 package com.example.buensaborback.bussines.service.impl;
 
 import com.example.buensaborback.bussines.service.IUsuarioService;
+import com.example.buensaborback.domain.dto.Auth0User;
+import com.example.buensaborback.domain.dto.ErrorDto;
 import com.example.buensaborback.domain.entities.Usuario;
 import com.example.buensaborback.domain.entities.enums.Rol;
+import com.example.buensaborback.presentation.advice.exception.Auth0Exception;
 import com.example.buensaborback.presentation.advice.exception.NotFoundException;
 import com.example.buensaborback.presentation.advice.exception.UnauthorizeException;
 import com.example.buensaborback.repositories.UsuarioRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class UsuarioServiceImpl implements IUsuarioService {
     private final UsuarioRepository usuarioRepository;
+    private final Auth0Service auth0Service;
+
 
     @Autowired
-    public UsuarioServiceImpl(UsuarioRepository usuarioRepository) {
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, Auth0Service auth0Service) {
         this.usuarioRepository = usuarioRepository;
+        this.auth0Service = auth0Service;
     }
 
     @Override
@@ -109,5 +122,45 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
         usuario.setRol(newRol);
         return usuarioRepository.save(usuario);
+    }
+
+    public Usuario createUser(Auth0User body) {
+        String token = auth0Service.getManagementApiToken();
+        String usersDomain = String.valueOf(auth0Service.getDomain());
+        if (usersDomain.endsWith("/")) {
+            usersDomain = usersDomain.substring(0, usersDomain.length() - 1);
+        }
+        String url = String.format("%s%s", usersDomain , "/users");
+        Map<String, String> headers = new HashMap<>();
+        headers.put("content-type", "application/json");
+        headers.put("authorization", "Bearer " + token);
+        try {
+            Rol rol = body.getRol();
+            body.setRol(null); //Rol no es parte de objeto Auth0
+            body.setConnection("Username-Password-Authentication");
+            HttpResponse<String> response = Unirest.post(url)
+                    .body(body)
+                    .headers(headers)
+                    .asString();
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            if(response.isSuccess()){
+                body = objectMapper.readValue(response.getBody(), Auth0User.class);
+                System.out.println("RESPONSE");
+                System.out.println(body);
+                Usuario usuario = Usuario.builder()
+                        .email(body.getEmail())
+                        .auth0Id(body.getUserId())
+                        .username(body.getNickname())
+                        .rol(rol).build();;
+                return usuarioRepository.save(usuario);
+            }else{
+                ErrorDto error = objectMapper.readValue((response.getBody()), ErrorDto.class);
+                String message = error.getMessage();
+                throw new Auth0Exception(message);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
