@@ -37,12 +37,12 @@ public class Categoria extends Base {
 
     @ManyToOne
     @JoinColumn(name = "categoria_padre_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "sucursales","articulos", "subCategorias"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "sucursales", "subCategorias"})
     private Categoria categoriaPadre;
 
     @OneToMany(mappedBy = "categoriaPadre", cascade = CascadeType.ALL)
     @Builder.Default
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "articulos"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer","categoriaPadre","sucursales"})
     private Set<Categoria> subCategorias = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
