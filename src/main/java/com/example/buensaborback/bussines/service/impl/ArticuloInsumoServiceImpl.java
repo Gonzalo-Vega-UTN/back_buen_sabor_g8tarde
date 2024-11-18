@@ -159,7 +159,7 @@ public class ArticuloInsumoServiceImpl implements IArticuloInsumoService {
         // Consulta en el repositorio
         Set<ArticuloInsumo> lista = new HashSet<>();
         for (Categoria cat : subCategorias){
-            lista.addAll(articuloInsumoRepository.findByAltaTrueAndCategoria_IdAndSucursal_Id(cat.getId(), sucursal.getId()));
+            lista.addAll(articuloInsumoRepository.findByAltaTrueAndCategoria_IdAndSucursal_IdAndEsParaElaborarFalse(cat.getId(), sucursal.getId()));
         }
 
         return lista.stream().toList();

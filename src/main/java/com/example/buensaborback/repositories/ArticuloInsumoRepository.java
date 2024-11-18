@@ -20,5 +20,5 @@ public interface ArticuloInsumoRepository extends JpaRepository<ArticuloInsumo, 
             """)
     List<ArticuloInsumo> findBySucursalCategoriaAndSubCategoriasAndEsParaElaborar(Long idSucursal, Long idCategoria, List<Long> subCategoriasIds);
 
-    Set<ArticuloInsumo> findByAltaTrueAndCategoria_IdAndSucursal_Id(Long id, Long id1);
+    Set<ArticuloInsumo> findByAltaTrueAndCategoria_IdAndSucursal_IdAndEsParaElaborarFalse(Long id, Long id1);
 }
