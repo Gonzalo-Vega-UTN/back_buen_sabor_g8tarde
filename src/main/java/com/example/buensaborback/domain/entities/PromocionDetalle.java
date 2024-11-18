@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @ToString
 @SuperBuilder
 
-@JsonIgnoreProperties({"hibernateLazyInitializer", "promocion"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "promocion" ,"categoria"})
 public class PromocionDetalle extends Base{
    private Integer cantidad;
 
