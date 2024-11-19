@@ -16,10 +16,7 @@ import org.springframework.core.annotation.Order;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 @SpringBootApplication
 public class BuenSaborBackApplication {
@@ -92,6 +89,10 @@ public class BuenSaborBackApplication {
     @Order(1)
     CommandLineRunner init2() {
         return args -> {
+            if (paisRepository.count() > 0) {
+                logger.info("La base de datos ya contiene datos de países, se omite init2.");
+                return;
+            }
             System.out.println("Guardando Datos Domicilio");
             Pais argentina = Pais.builder()
                     .nombre("Argentina")
@@ -116,6 +117,10 @@ public class BuenSaborBackApplication {
     @Order(2)
     CommandLineRunner init() {
         return args -> {
+            if (empresaRepository.count() > 0 || sucursalRepository.count() > 0) {
+                logger.info("La base de datos ya contiene datos de empresas o sucursales, se omite init.");
+                return;
+            }
             logger.info("----------------Persistiendo los modelos---------------------");
             //Se crea empresa
             Empresa empresa = Empresa.builder()
@@ -473,6 +478,10 @@ public class BuenSaborBackApplication {
     @Order(3)
     CommandLineRunner init3() {
         return args -> {
+            if (domicilioRepository.count() == 0) {
+                logger.info("No hay domicilios en la base de datos, se omite init3.");
+                return;
+            }
             List<Localidad> localidades = this.localidadService.getAll();
             if (!localidades.isEmpty()) {
                 List<Domicilio> domicilios = this.domicilioRepository.findAll();
@@ -498,8 +507,19 @@ public class BuenSaborBackApplication {
         //adminr@gmail.com
         //A123456!a
         return args -> {
-            Usuario usuario = Usuario.builder().rol(Rol.Admin).email("adminr@gmail.com").alta(true).username("adminr").build();
-            usuarioRepository.save(usuario);
+            Optional<Usuario> usuarioExistente = usuarioRepository.findByUsername("adminr");
+            if (!usuarioExistente.isPresent()) { // Verifica si el Optional está vacío
+                Usuario usuario = Usuario.builder()
+                        .rol(Rol.Admin)
+                        .email("adminr@gmail.com")
+                        .alta(true)
+                        .username("adminr") // Campo opcional
+                        .build();
+                usuarioRepository.save(usuario);
+                logger.info("Usuario 'adminr' creado exitosamente.");
+            } else {
+                logger.info("Usuario 'adminr' ya existe. No se creó uno nuevo.");
+            }
         };
 
 
