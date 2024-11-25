@@ -23,7 +23,6 @@ public class SucursalController {
 
     @PostMapping
     public ResponseEntity<Sucursal> createSucursal(@RequestBody Sucursal sucursal) {
-        System.out.println("sucursal " + sucursal);
         Sucursal savedSucursal = sucursalService.saveSucursal(sucursal);
         return ResponseEntity.ok(savedSucursal);
     }
@@ -47,17 +46,12 @@ public class SucursalController {
     @PutMapping("/{id}")
     public ResponseEntity<Sucursal> updateSucursal(@PathVariable Long id, @RequestBody Sucursal sucursal) {
         Sucursal updatedSucursal = sucursalService.updateSucursal(id, sucursal);
-        if (updatedSucursal != null) {
-            return ResponseEntity.ok(updatedSucursal);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(updatedSucursal);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSucursal(@PathVariable Long id) {
-        sucursalService.deleteSucursal(id);
-        return ResponseEntity.noContent().build();
+    @PatchMapping("/{id}")
+    public ResponseEntity<Sucursal> changeStatus(@PathVariable Long id, @RequestParam boolean status) {
+        return ResponseEntity.ok(sucursalService.changeStatus(id, status));
     }
 
     @GetMapping("/empresa/{empresaId}")

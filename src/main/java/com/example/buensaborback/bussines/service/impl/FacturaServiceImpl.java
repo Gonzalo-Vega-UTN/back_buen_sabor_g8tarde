@@ -52,7 +52,6 @@ public class FacturaServiceImpl implements IFacturaService {
             emailService.sendEmailWithAttachment(email, subject, body, pdfBytes, attachmentName);
         } catch (IOException | DocumentException e) {
             e.printStackTrace();
-            // Handle the exception appropriately
         }
     }
 }

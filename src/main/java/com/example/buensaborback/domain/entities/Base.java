@@ -15,10 +15,9 @@ import java.io.Serializable;
 @ToString
 @Setter
 @SuperBuilder
-@DynamicInsert
 public abstract class Base implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column

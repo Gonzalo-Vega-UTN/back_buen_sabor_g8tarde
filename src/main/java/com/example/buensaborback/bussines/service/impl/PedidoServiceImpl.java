@@ -3,14 +3,16 @@ package com.example.buensaborback.bussines.service.impl;
 import com.example.buensaborback.bussines.service.*;
 import com.example.buensaborback.domain.entities.*;
 import com.example.buensaborback.domain.entities.enums.Estado;
+import com.example.buensaborback.domain.entities.enums.TipoEnvio;
 import com.example.buensaborback.presentation.advice.exception.InsufficientStock;
 import com.example.buensaborback.presentation.advice.exception.NotFoundException;
 import com.example.buensaborback.repositories.PedidoRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 
@@ -23,8 +25,9 @@ public class PedidoServiceImpl implements IPedidoService {
     private final IClienteService clienteService;
     private final IFacturaService facturaService;
     private final ISucursalService sucursalService;
+    private final IDomicilioService domicilioService;
 @Autowired
-    public PedidoServiceImpl(PedidoRepository pedidoRepository, UsuarioServiceImpl usuarioService, ArtManufacturadoServiceImpl artManufacturadoService, ClienteServiceImpl clienteServiceImpl, ArticuloInsumoServiceImpl artInsumoService, FacturaServiceImpl facturaService, ISucursalService sucursalService) {
+    public PedidoServiceImpl(PedidoRepository pedidoRepository, UsuarioServiceImpl usuarioService, ArtManufacturadoServiceImpl artManufacturadoService, ClienteServiceImpl clienteServiceImpl, ArticuloInsumoServiceImpl artInsumoService, FacturaServiceImpl facturaService, ISucursalService sucursalService, IDomicilioService domicilioService) {
         this.pedidoRepository = pedidoRepository;
         this.usuarioService = usuarioService;
         this.artManufacturadoService = artManufacturadoService;
@@ -32,7 +35,8 @@ public class PedidoServiceImpl implements IPedidoService {
         this.artInsumoService = artInsumoService;
         this.facturaService = facturaService;
         this.sucursalService = sucursalService;
-    }
+    this.domicilioService = domicilioService;
+}
     @Override
     public Pedido getPedidoById(Long id){
         return this.pedidoRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Pedido con ID %d no encontrado", id)));
@@ -42,18 +46,20 @@ public class PedidoServiceImpl implements IPedidoService {
     public boolean existsPedidoById(Long id){
         return this.pedidoRepository.existsById(id);
     }
-//    @Transactional
+  @Transactional
     public Pedido save(Pedido pedido) {
-        pedido.setEstado(Estado.Preparacion);
+        LocalTime now = LocalTime.now();
+        int tiempoPreparacion=0;
+        pedido.setEstado(Estado.EnProceso);
+        Domicilio domicilio =domicilioService.getDomicilioById(pedido.getDomicilio().getId());
+        pedido.setDomicilio(domicilio);
         Sucursal sucursal = sucursalService.getSucursalById(pedido.getSucursal().getId());
         pedido.setSucursal(sucursal);
-        System.out.println("Pedido recibido: " + pedido.toString());
         Usuario usuarioOp = usuarioService.getUsuarioByUsername(pedido.getCliente().getUsuario().getUsername());
             pedido.setCliente(usuarioOp.getCliente());
             for (DetallePedido detalle : pedido.getDetallePedidos()) {
                 //Preguntar si existe, sino Falla
                 Articulo articulo = getArticulo(detalle);
-
                 //Revisar cantidades actuales de los insumos
                 if(articulo instanceof ArticuloManufacturado){
                     ((ArticuloManufacturado) articulo).getArticuloManufacturadoDetalles().forEach(detalleManufacturado -> {      //Cantidad que necesito para 1      //Cantidad que pide
@@ -65,11 +71,19 @@ public class PedidoServiceImpl implements IPedidoService {
                         //Hay que guardar el nuevo stock
                         detalleManufacturado.getArticuloInsumo().setStockActual(stockRestante);
                     });
+                    tiempoPreparacion+=((ArticuloManufacturado) articulo).getTiempoEstimadoMinutos();
                 }
+
                 pedido.setTotalCosto(calcularCostoTotal(pedido.getDetallePedidos()));
                 detalle.setArticulo(articulo);
                 detalle.setPedido(pedido);
             }
+            if (pedido.getTipoEnvio() == TipoEnvio.Delivery) {
+                tiempoPreparacion += 10;
+            }
+        LocalTime tiempoEstimado = now.plusMinutes(tiempoPreparacion).withSecond(0).withNano(0);
+
+        pedido.setHoraEstimadaFinalizacion(tiempoEstimado);
             return pedidoRepository.save(pedido);
 
     }
@@ -91,7 +105,6 @@ public class PedidoServiceImpl implements IPedidoService {
                 total += ((ArticuloInsumo) articulo).getPrecioCompra() * detallePedido.getCantidad();
             }
         }
-        System.out.println("TOTAL COSTO " + total);
         return total;
     }
 
@@ -104,19 +117,17 @@ public class PedidoServiceImpl implements IPedidoService {
     }
 
     @Override
-//    @Transactional(readOnly = true)
     public List<Pedido> getAll() {
         return pedidoRepository.findAll();
     }
 
     @Override
-//    @Transactional(readOnly = true)
-    public List<Pedido> getAllByFecha(LocalDate fecha) {
-        return pedidoRepository.findByFechaPedido(fecha);
+    public List<Pedido> getAllByFecha(LocalDate fecha, Long idSucursal) {
+        Sucursal sucursal = sucursalService.getSucursalById(idSucursal);
+        return pedidoRepository.findByFechaPedidoAndSucursal(fecha, sucursal);
     }
 
     @Override
-//    @Transactional
     public Pedido delete(Long id) {
         Pedido pedido = this.getPedidoById(id);
         pedido.setAlta(pedido.isAlta());
@@ -124,23 +135,24 @@ public class PedidoServiceImpl implements IPedidoService {
     }
 
     @Override
-    public List<Pedido> getAllByCliente(Long idCliente){
-        Cliente cliente = this.clienteService.getClienteById(idCliente);
-        return this.pedidoRepository.findByAltaTrueAndCliente(cliente);
+    public List<Pedido> getAllByCliente(String user){
+
+        Usuario usuario =this.usuarioService.getUsuarioByUsername(user);
+        return this.pedidoRepository.findByAltaTrueAndCliente(usuario.getCliente());
     }
-    public List<Object> findTopProducts(LocalDate startDate, LocalDate endDate) {
-        return pedidoRepository.findTopProducts(startDate, endDate);
+    public List<Object[]> findTopProducts(LocalDate startDate, LocalDate endDate, Long idSucursal) {
+        return pedidoRepository.findTopProductsBySucursal(startDate, endDate, idSucursal);
     }
 
-    public List<Pedido> findPedidosBetweenDates(LocalDate startDate, LocalDate endDate) {
-        return pedidoRepository.findByFechaPedidoBetween(startDate, endDate);
+    public List<Pedido> findPedidosBetweenDates(LocalDate startDate, LocalDate endDate, Long idSucursal) {
+        return pedidoRepository.findBySucursal_IdAndFechaPedidoBetween(startDate, endDate, idSucursal);
 
     }
-    public List<Pedido> findByEstado(Estado estado){
-        return pedidoRepository.findByEstado(estado);
+    public List<Pedido> findByEstado(Estado estado, Long idSucursal){
+        Sucursal sucursal = sucursalService.getSucursalById(idSucursal);
+        return pedidoRepository.findByEstadoAndSucursal(estado, sucursal);
     }
 
-    //@Transactional
     public Pedido actualizarEstado(Long id, Estado estado){
         Pedido pedido = this.getPedidoById(id);
         pedido.setEstado(estado);

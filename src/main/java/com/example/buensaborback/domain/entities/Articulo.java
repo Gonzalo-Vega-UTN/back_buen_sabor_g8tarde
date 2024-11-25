@@ -10,15 +10,14 @@ import lombok.experimental.SuperBuilder;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @ToString
 @SuperBuilder
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-
+@Inheritance(strategy = InheritanceType.JOINED)
+@Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer","promocionDetalle"})
 public class Articulo extends Base {
 

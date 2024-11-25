@@ -31,7 +31,6 @@ public class EmailServiceImpl implements IEmailService {
             emailSender.send(message);
         } catch (MessagingException e) {
             e.printStackTrace();
-            // Handle the exception appropriately
         }
     }
 }

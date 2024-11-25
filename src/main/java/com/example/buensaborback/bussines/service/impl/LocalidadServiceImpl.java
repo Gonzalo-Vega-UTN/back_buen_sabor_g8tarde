@@ -24,15 +24,20 @@ public class LocalidadServiceImpl implements ILocalidadService {
 
     @Override
     public List<Localidad> findLocalidadesByProvincia(Long idProvincia) {
+        if(idProvincia == 0) return this.localidadRepository.findAll();
         Provincia provincia =  this.provinciaService.getProvinciaById(idProvincia);
         return this.localidadRepository.findByProvincia(provincia);
     }
 
     @Override
-    public Localidad getLocalidadById(Long idPais){
-        return this.localidadRepository.findById(idPais).orElseThrow(() -> new NotFoundException(String.format("Localidad con ID %d no encontrado", idPais)));
+    public Localidad getLocalidadById(Long idLocalidad){
+        return this.localidadRepository.findById(idLocalidad).orElseThrow(() -> new NotFoundException(String.format("Localidad con ID %d no encontrado", idLocalidad)));
     }
     public boolean existLocalidadById(Long idLocalidad){
         return this.localidadRepository.existsById(idLocalidad);
+    }
+
+    public List<Localidad> getAll(){
+        return this.localidadRepository.findAll();
     }
 }

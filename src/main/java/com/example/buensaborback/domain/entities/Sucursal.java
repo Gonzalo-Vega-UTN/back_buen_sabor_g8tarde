@@ -26,10 +26,10 @@ public class Sucursal extends Base{
     private LocalTime horarioApertura;
     private LocalTime horarioCierre;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Domicilio domicilio;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "sucursal_categoria",
             joinColumns = @JoinColumn(name = "sucursal_id"),
             inverseJoinColumns = @JoinColumn(name = "categoria_id"))
@@ -37,7 +37,6 @@ public class Sucursal extends Base{
     private Set<Categoria> categorias = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "sucursal", fetch = FetchType.LAZY)
-
     private Set<Pedido> pedidos;
 
     @ManyToMany(cascade = CascadeType.ALL)
@@ -47,10 +46,9 @@ public class Sucursal extends Base{
     @Builder.Default
     private Set<Promocion> promociones = new HashSet<>();
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "empresa_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "sucursales"})
-
     private Empresa empresa;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

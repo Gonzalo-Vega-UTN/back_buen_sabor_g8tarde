@@ -13,6 +13,6 @@ public interface IEmpresaService {
     List<Empresa> getAll();
     List<Empresa> getAllAlta();
     Empresa updateEmpresa(Long id, Empresa empresa);
-    void deleteEmpresa(Long id);
+    Empresa changeStatus(Long id, boolean status);
     Set<Imagen> uploadImages(MultipartFile[] files, Long id);
 }

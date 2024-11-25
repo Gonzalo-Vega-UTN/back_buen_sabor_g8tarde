@@ -77,9 +77,6 @@ public class DomicilioController {
 
     @PostMapping("")
     public ResponseEntity<Domicilio> save(@RequestBody Domicilio body){
-        System.out.println(body.getLocalidad().getNombre());
-        System.out.println(body.getLocalidad().getProvincia().getNombre());
-        System.out.println(body.getLocalidad().getProvincia().getPais().getNombre());
         return ResponseEntity.ok().body(this.domicilioService.create(body));
     }
 

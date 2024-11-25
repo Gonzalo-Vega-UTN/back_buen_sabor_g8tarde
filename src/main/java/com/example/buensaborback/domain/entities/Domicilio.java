@@ -25,11 +25,11 @@ public class Domicilio extends Base{
     private Integer numero;
     private Integer cp;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "id_localidad")
     private Localidad localidad;
 
-    @ManyToMany(mappedBy = "domicilios", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "domicilios", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Builder.Default
     private Set<Cliente> clientes = new HashSet<>();
 

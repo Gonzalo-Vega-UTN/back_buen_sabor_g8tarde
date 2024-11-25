@@ -13,6 +13,7 @@ public interface IDomicilioService {
     Domicilio delete(Long id);
     List<Domicilio> findAll() ;
     List<Domicilio> findAllAlta();
+    Localidad getLocalidadById(Long id);
 
 
 

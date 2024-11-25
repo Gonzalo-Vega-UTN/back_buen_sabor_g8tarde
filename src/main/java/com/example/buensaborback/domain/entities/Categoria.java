@@ -9,6 +9,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -16,16 +17,17 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@ToString
+@ToString(exclude = {"categoriaPadre", "subCategorias"})
 @SuperBuilder
 
-@JsonIgnoreProperties({"hibernateLazyInitializer", "sucursales","articulos"})
+@JsonIgnoreProperties({"hibernateLazyInitializer","articulos"})
 public class Categoria extends Base {
 
     private String denominacion;
 
-    @ManyToMany(mappedBy = "categorias")
+    @ManyToMany(mappedBy = "categorias", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Builder.Default
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "domicilio","empresa", "imagenes","articulos","categorias"})
     private Set<Sucursal> sucursales = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "categoria", fetch = FetchType.LAZY)
@@ -35,16 +37,18 @@ public class Categoria extends Base {
 
     @ManyToOne
     @JoinColumn(name = "categoria_padre_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "sucursales","articulos", "subCategorias"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "sucursales", "subCategorias"})
     private Categoria categoriaPadre;
 
     @OneToMany(mappedBy = "categoriaPadre", cascade = CascadeType.ALL)
     @Builder.Default
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "sucursales","articulos"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer","categoriaPadre"})
     private Set<Categoria> subCategorias = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name= "categoria_id")
     @Builder.Default
     protected Set<Imagen> imagenes = new HashSet<Imagen>();
+
+
 }

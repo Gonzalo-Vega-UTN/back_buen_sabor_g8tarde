@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface SucursalRepository extends JpaRepository<Sucursal, Long>{
     List<Sucursal> findByEmpresaId(Long empresaId);
+
+    boolean existsByNombreIgnoreCaseAndEmpresa(String nombre, Empresa empresa);
 }

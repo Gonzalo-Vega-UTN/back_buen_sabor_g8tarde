@@ -14,14 +14,14 @@ public interface IPedidoService {
     boolean existsPedidoById(Long id);
     Pedido save(Pedido pedido);
     List<Pedido> getAll();
-    List<Pedido> getAllByCliente(Long idCliente);
-    List<Pedido> getAllByFecha(LocalDate fecha);
+    List<Pedido> getAllByCliente(String user);
+    List<Pedido> getAllByFecha(LocalDate fecha, Long idSucursal);
     Pedido delete(Long id);
-    List<Object> findTopProducts(LocalDate startDate, LocalDate endDate);
+    List<Object[]> findTopProducts(LocalDate startDate, LocalDate endDate, Long idSucursal);
 
-    List<Pedido> findPedidosBetweenDates(LocalDate startDate, LocalDate endDate);
+    List<Pedido> findPedidosBetweenDates(LocalDate startDate, LocalDate endDate, Long idSucursal);
 
-    List<Pedido> findByEstado(Estado estado);
+    List<Pedido> findByEstado(Estado estado, Long idSucursal);
     Pedido actualizarEstado(Long id, Estado estado);
     Pedido findByFactura(Factura factura);
 }

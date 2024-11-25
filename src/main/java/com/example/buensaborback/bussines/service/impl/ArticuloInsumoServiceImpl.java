@@ -10,10 +10,7 @@ import com.example.buensaborback.repositories.ImagenRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
@@ -148,18 +145,24 @@ public class ArticuloInsumoServiceImpl implements IArticuloInsumoService {
     @Override
     public List<ArticuloInsumo> findArtInsumoFromCategoryAndSubcategories(Long idSucursal, Long idCategoria) {
         Sucursal sucursal = this.sucursalService.getSucursalById(idSucursal);
+        if(idCategoria == 0){
+            return this.articuloInsumoRepository.findBySucursal(sucursal);
+        }
         Categoria categoria = this.categoriaServiceImpl.getCategoriaById(idCategoria);
 
-        List<Long> subCategoriasIds = categoria.getSubCategorias().stream()
+        // Recoge los IDs de las subcategorías que pertenecen a la sucursal específica
+        List<Categoria> subCategorias = new ArrayList<>(categoria.getSubCategorias().stream()
                 .filter(subcategoria -> subcategoria.getSucursales().stream().anyMatch(s -> s.getId().equals(sucursal.getId())))
-                .map(Base::getId)
-                .collect(Collectors.toList());
+                .toList());
 
-        List<ArticuloInsumo> lista = this.articuloInsumoRepository.findBySucursalCategoriaAndSubCategoriasAndEsParaElaborar(sucursal.getId(), categoria.getId(), subCategoriasIds);
+        subCategorias.add(categoria);
+        // Consulta en el repositorio
+        Set<ArticuloInsumo> lista = new HashSet<>();
+        for (Categoria cat : subCategorias){
+            lista.addAll(articuloInsumoRepository.findByAltaTrueAndCategoria_IdAndSucursal_IdAndEsParaElaborarFalse(cat.getId(), sucursal.getId()));
+        }
 
-        System.out.println(lista.size());
-
-        return lista;
+        return lista.stream().toList();
     }
 
 

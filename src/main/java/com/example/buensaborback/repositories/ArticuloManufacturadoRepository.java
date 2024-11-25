@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 
 @Repository
@@ -20,5 +21,6 @@ public interface ArticuloManufacturadoRepository extends JpaRepository<ArticuloM
             """)
     List<ArticuloManufacturado> findBySucursalCategoriaAndSubCategorias(Long idSucursal, Long idCategoria, Collection<Long> subCategoriasIds);
 
+    Set<ArticuloManufacturado> findByAltaTrueAndCategoria_IdAndSucursal_Id(Long id, Long id1);
 
 }

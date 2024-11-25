@@ -6,6 +6,7 @@ import com.example.buensaborback.domain.entities.Cliente;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,6 +59,13 @@ public class ClienteController{
     @GetMapping("/username/{username}")
     public ResponseEntity<?> getOne(@PathVariable("username") String username){
         return ResponseEntity.ok().body(this.clienteService.getClienteByUsername(username));
+    }
+
+    @PostMapping("/uploads")
+    public ResponseEntity<?> uploadImages(@RequestParam(value = "id") Long idArticulo,
+                                          @RequestParam(value = "uploads") MultipartFile[] files) {
+        return ResponseEntity.ok(clienteService.uploadImages(files, idArticulo));
+
     }
 
 }

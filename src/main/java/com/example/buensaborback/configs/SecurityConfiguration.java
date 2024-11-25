@@ -39,127 +39,122 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf((csrf) -> csrf.disable())
+                .csrf(csrf -> csrf.disable())
                 .cors(withDefaults()) //por defecto spring va a buscar un bean con el nombre "corsConfigurationSource".
-                .headers(httpSecurityHeadersConfigurer -> {
-                    httpSecurityHeadersConfigurer.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable);
-                })
-                .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
 
-                                // Definir reglas para ArticuloInsumoController
-                                .requestMatchers(HttpMethod.GET, "/api/articulos/insumos").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/articulos/insumos/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/articulos/insumos").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/articulos/insumos/bulk").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/articulos/insumos/uploads").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/api/articulos/insumos/**").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/api/articulos/insumos/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/articulos/insumos/search").permitAll()
+                        // Definir reglas para ArticuloInsumoController
+                        .requestMatchers(HttpMethod.GET, "/api/articulos/insumos").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/articulos/insumos/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/articulos/insumos").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/articulos/insumos/bulk").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/articulos/insumos/uploads").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/articulos/insumos/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/articulos/insumos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/articulos/insumos/search").permitAll()
 
-                                // Definir reglas para ArticuloManufacturadoController
+                        // Definir reglas para ArticuloManufacturadoController
+                        .requestMatchers(HttpMethod.GET, "/api/articulos/manufacturados").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/articulos/manufacturados/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/articulos/manufacturados").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/articulos/manufacturados/bulk").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/articulos/manufacturados/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/articulos/manufacturados/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/articulos/manufacturados/search").permitAll()
 
-                                .requestMatchers(HttpMethod.GET, "/api/articulos/manufacturados").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/articulos/manufacturados/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/articulos/manufacturados").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/articulos/manufacturados/bulk").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/api/articulos/manufacturados/**").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/api/articulos/manufacturados/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/articulos/manufacturados/search").permitAll()
+                        // Categorias
+                        .requestMatchers(HttpMethod.GET, "/api/categorias").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categorias/padres").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categorias/alta").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/categorias/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/categorias/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/categorias/bulk").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/categorias/**").permitAll()
 
-                                // Categorias
-                                .requestMatchers(HttpMethod.GET, "/api/categorias").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/categorias/padres").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/categorias/alta").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/api/categorias/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/categorias/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/categorias/bulk").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/api/categorias/**").permitAll()
+                        //Clientes
+                        .requestMatchers(HttpMethod.GET, "/api/clientes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/clientes/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/clientes").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/clientes/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/clientes/**").permitAll()
 
-                                //Clientes
-                                .requestMatchers(HttpMethod.GET, "/api/clientes").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/clientes/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/clientes").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/api/clientes/**").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/api/clientes/**").permitAll()
+                        //Domicilios
+                        .requestMatchers(HttpMethod.GET, "/api/domicilios").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/domicilios/alta").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/domicilios/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/domicilios/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/domicilios").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/domicilios/**").permitAll()
 
-                                //Domicilios
-                                .requestMatchers(HttpMethod.GET, "/api/domicilios").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/domicilios/alta").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/domicilios/**").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/api/domicilios/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/domicilios").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/api/domicilios/**").permitAll()
+                        //Empresa
+                        .requestMatchers(HttpMethod.GET, "/api/empresas").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/empresas/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/empresas").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/empresas/**").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/api/empresas/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/empresas/**").permitAll()
 
-                                //Empresa
-                                .requestMatchers(HttpMethod.GET, "/api/empresas").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/empresas/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/empresas").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/api/empresas/**").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/api/empresas/**").permitAll()
+                        //Mercado Pago
+                        .requestMatchers(HttpMethod.POST, "/api/mercado-pago/crear_preference_mp").permitAll()
 
-                                //Mercado Pago
-                                .requestMatchers(HttpMethod.POST, "/api/mercado-pago/crear_preference_mp").permitAll()
+                        //Pedido
+                        .requestMatchers(HttpMethod.POST, "/api/pedidos").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/pedidos").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/pedidos/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/pedidos/actualizar/**").permitAll()
 
-                                //Pedido
-                                .requestMatchers(HttpMethod.POST, "/api/pedidos").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/pedidos").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/pedidos/**").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/api/pedidos/actualizar/**").permitAll()
+                        //Promocion
+                        .requestMatchers(HttpMethod.GET, "/api/promociones").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/promociones/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/promociones").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/promociones/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/promociones/**").permitAll()
 
-                                //Promocion
-                                .requestMatchers(HttpMethod.GET, "/api/promociones").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/promociones/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/promociones").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/api/promociones/**").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/api/promociones/**").permitAll()
+                        //PromocionDetalle
+                        .requestMatchers(HttpMethod.GET, "/api/promociones-detalles").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/promociones-detalles/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/promociones-detalles").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/promociones-detalles/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/promociones-detalles/**").permitAll()
 
-                                //PromocionDetalle
-                                .requestMatchers(HttpMethod.GET, "/api/promociones-detalles").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/promociones-detalles/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/promociones-detalles").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/api/promociones-detalles/**").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/api/promociones-detalles/**").permitAll()
+                        //Reportes
+                        .requestMatchers(HttpMethod.GET, "/api/reportes/top-products").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reportes/ReporteTotales").permitAll()
 
-                                //Reportes
-                                .requestMatchers(HttpMethod.GET, "/api/reportes/top-products").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/reportes/ReporteTotales").permitAll()
+                        //Sucursal
+                        .requestMatchers(HttpMethod.POST, "/api/sucursales").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/sucursales/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/sucursales").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/sucursales/{id}").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/sucursales/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/sucursales/empresa/{empresaId}").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/api/sucursales/{id}**").permitAll()
 
-                                //Sucursal
-                                .requestMatchers(HttpMethod.POST, "/api/sucursales").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/sucursales/{id}").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/sucursales").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/api/sucursales/{id}").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/api/sucursales/{id}").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/sucursales/empresa/{empresaId}").permitAll()
+                        //Unidad Medida
+                        .requestMatchers(HttpMethod.GET, "/api/unidades-medida").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/unidades-medida/alta").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/unidades-medida/{id}").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/unidades-medida/{id}").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/unidades-medida").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/unidades-medida/bulk").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/unidades-medida/{id}").permitAll()
 
-                                //Unidad Medida
-                                .requestMatchers(HttpMethod.GET, "/api/unidades-medida").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/unidades-medida/alta").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/unidades-medida/{id}").permitAll()
-                                .requestMatchers(HttpMethod.PUT, "/api/unidades-medida/{id}").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/unidades-medida").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/unidades-medida/bulk").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/api/unidades-medida/{id}").permitAll()
+                        //Usuario
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auth/validar").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auth/cliente/{nombreUsuario}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auth/**").permitAll()
 
-                                //Usuario
-                                .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/auth/validar/{nombreUsuario}").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/auth/cliente/{nombreUsuario}").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/auth").permitAll()
-
-
-                                .anyRequest().permitAll()
+                        .anyRequest().permitAll()
                 )
-                .oauth2ResourceServer(oauth2ResourceServer ->
-                        oauth2ResourceServer
-                                .jwt(jwt ->
-                                        jwt
-                                                .decoder(jwtDecoder())
-                                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                                )
+                .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer
+                        .jwt(jwt -> jwt
+                                .decoder(jwtDecoder())
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        )
                 );
         return http.build();
     }
@@ -168,7 +163,7 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(corsAllowedOrigins.split(",")));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setExposedHeaders(Arrays.asList("X-Get-Header"));
@@ -196,8 +191,7 @@ public class SecurityConfiguration {
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
-        String audience = System.getenv("auth0.audience");
-        converter.setAuthoritiesClaimName(audience+"/roles");
+        converter.setAuthoritiesClaimName("permissions");
         converter.setAuthorityPrefix("");
 
         JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();

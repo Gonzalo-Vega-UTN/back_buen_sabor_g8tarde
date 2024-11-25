@@ -6,5 +6,5 @@ import java.util.Set;
 
 public interface IImagenService {
 
-    public void updateImagenes(Set<Imagen> imagenesViejas, Set<Imagen> imagenesNuevas);
+    void updateImagenes(Set<Imagen> imagenesViejas, Set<Imagen> imagenesNuevas);
 }

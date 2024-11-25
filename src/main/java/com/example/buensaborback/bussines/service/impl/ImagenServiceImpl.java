@@ -3,12 +3,14 @@ package com.example.buensaborback.bussines.service.impl;
 import com.example.buensaborback.bussines.service.ICloudinaryService;
 import com.example.buensaborback.bussines.service.IImagenService;
 import com.example.buensaborback.domain.entities.Imagen;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ImagenServiceImpl implements IImagenService {
 
     private final ICloudinaryService cloudinaryService;
@@ -27,7 +29,11 @@ public class ImagenServiceImpl implements IImagenService {
         // Eliminar las imágenes obsoletas de Cloudinary
         for (Imagen image : imagesToRemove) {
             String publicId = image.getUrl().split("/")[image.getUrl().split("/").length -1]; //El publicId es el final de la url
-            cloudinaryService.deleteImage(publicId);
+
+            boolean result = cloudinaryService.deleteImage(publicId);
+            log.warn(String.format("Eliminando imagen %s. Operation Status: %s", publicId, result));
         }
+        imagenesViejas.clear();
+        imagenesViejas.addAll(imagenesNuevas);
     }
 }

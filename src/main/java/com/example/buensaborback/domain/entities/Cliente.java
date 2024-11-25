@@ -28,19 +28,21 @@ public class Cliente extends Base{
     private LocalDate fechaNacimiento;
 
     @OneToOne(cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @JsonIgnoreProperties({"hibernateLazyInitializer","cliente","empleado"})
     private Usuario usuario;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name= "cliente_id")
     @Builder.Default
+    @ToString.Exclude
     protected Set<Imagen> imagenes = new HashSet<Imagen>();
 
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cliente")
     @Builder.Default
-
+    @ToString.Exclude
     private Set<Pedido> pedidos = new HashSet<>();
-
 
 
     @ManyToMany(cascade = CascadeType.ALL)
@@ -48,6 +50,7 @@ public class Cliente extends Base{
             joinColumns = @JoinColumn(name = "Cliente_id"),
             inverseJoinColumns = @JoinColumn(name = "domicilio_id"))
     @Builder.Default
+    @ToString.Exclude
     private Set<Domicilio> domicilios = new HashSet<>();
 
 

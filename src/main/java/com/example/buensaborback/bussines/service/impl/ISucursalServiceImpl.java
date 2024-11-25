@@ -1,19 +1,15 @@
 package com.example.buensaborback.bussines.service.impl;
 
-import com.example.buensaborback.bussines.service.ICloudinaryService;
-import com.example.buensaborback.bussines.service.IEmpresaService;
-import com.example.buensaborback.bussines.service.IImagenService;
-import com.example.buensaborback.bussines.service.ISucursalService;
-import com.example.buensaborback.domain.entities.ArticuloInsumo;
+import com.example.buensaborback.bussines.service.*;
+import com.example.buensaborback.domain.entities.Base;
+import com.example.buensaborback.domain.entities.Empresa;
 import com.example.buensaborback.domain.entities.Imagen;
 import com.example.buensaborback.domain.entities.Sucursal;
 
-import com.example.buensaborback.presentation.advice.exception.BadRequestException;
-import com.example.buensaborback.presentation.advice.exception.ImageUploadLimitException;
-import com.example.buensaborback.presentation.advice.exception.NotFoundException;
+import com.example.buensaborback.presentation.advice.exception.*;
 import com.example.buensaborback.repositories.ImagenRepository;
 import com.example.buensaborback.repositories.SucursalRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.velocity.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,26 +24,29 @@ public class ISucursalServiceImpl implements ISucursalService {
     private final ICloudinaryService cloudinaryService;
     private final ImagenRepository imagenRepository;
     private final IImagenService imagenService;
-
     private final IEmpresaService empresaService;
+    private final IDomicilioService domicilioService;
 
     public ISucursalServiceImpl(SucursalRepository sucursalRepository, CloudinaryServiceImpl cloudinaryService,
                                 ImagenRepository imagenRepository, ImagenServiceImpl imagenService,
-                                IEmpresaServiceImpl empresaService) {
+                                IEmpresaServiceImpl empresaService, DomicilioServiceImpl domicilioService) {
         this.sucursalRepository = sucursalRepository;
         this.cloudinaryService = cloudinaryService;
         this.imagenRepository = imagenRepository;
         this.imagenService = imagenService;
         this.empresaService = empresaService;
+        this.domicilioService = domicilioService;
     }
 
     @Override
     public Sucursal saveSucursal(Sucursal sucursal) {
-        System.out.println(sucursal);
         sucursal.setEmpresa(empresaService.getEmpresaById(sucursal.getEmpresa().getId()));
-
+        sucursal.getDomicilio().setLocalidad(domicilioService.getLocalidadById(sucursal.getDomicilio().getLocalidad().getId()));
+        validateSucursalNombre(sucursal.getNombre(), sucursal.getEmpresa());
         return sucursalRepository.save(sucursal);
     }
+
+
 
     @Override
     public Sucursal getSucursalById(Long id) {
@@ -60,21 +59,54 @@ public class ISucursalServiceImpl implements ISucursalService {
     }
 
     @Override
-    public Sucursal updateSucursal(Long id, Sucursal sucursal) {
-       Sucursal existingSucursal = getSucursalById(id);
-            Sucursal updatedSucursal = existingSucursal;
-            updatedSucursal.setNombre(sucursal.getNombre());
-            updatedSucursal.setHorarioApertura(sucursal.getHorarioApertura());
-            updatedSucursal.setHorarioCierre(sucursal.getHorarioCierre());
-
-        //Verificar
-        imagenService.updateImagenes(existingSucursal.getImagenes(), updatedSucursal.getImagenes());
-            return sucursalRepository.save(updatedSucursal);
+    public List<Sucursal> getSucursalesByIds(List<Long> ids) {
+        return sucursalRepository.findAllById(ids);
     }
 
     @Override
-    public void deleteSucursal(Long id) {
-        sucursalRepository.deleteById(id);
+    public Sucursal updateSucursal(Long id, Sucursal sucursal) {
+        Sucursal existingSucursal = getSucursalById(id);
+        if(!sucursal.getNombre().equalsIgnoreCase(existingSucursal.getNombre())){
+            validateSucursalNombre(sucursal.getNombre(), sucursal.getEmpresa());
+        }
+        existingSucursal.setNombre(sucursal.getNombre());
+        existingSucursal.setHorarioApertura(sucursal.getHorarioApertura());
+        existingSucursal.setHorarioCierre(sucursal.getHorarioCierre());
+        sucursal.getDomicilio().setLocalidad(domicilioService.getLocalidadById(sucursal.getDomicilio().getLocalidad().getId()));
+        existingSucursal.setDomicilio(sucursal.getDomicilio());
+
+        imagenService.updateImagenes(existingSucursal.getImagenes(), sucursal.getImagenes());
+
+        return sucursalRepository.save(existingSucursal);
+    }
+
+    private void validateSucursalNombre(String nombre, Empresa empresa) {
+        if(sucursalRepository.existsByNombreIgnoreCaseAndEmpresa(nombre.trim(), empresa)){
+            throw new DuplicateEntryException(String.format("La sucursal'%s' ya existe", nombre));
+        }
+    }
+
+    @Override
+    public Sucursal changeStatus(Long id, boolean status) {
+        Sucursal existingSucursal = getSucursalById(id);
+        if (!status) checkForActiveEntities(existingSucursal);
+
+        existingSucursal.setAlta(status);
+        return sucursalRepository.save(existingSucursal);
+    }
+
+    private void checkForActiveEntities(Sucursal sucursal) {
+        long articulosActivos = sucursal.getArticulos().stream().filter(Base::isAlta).count();
+        if (articulosActivos > 0) {
+            String articuloMensaje = articulosActivos == 1 ? "1 artículo activo" : articulosActivos + " artículos activos";
+            throw new EntityInUseException(String.format("La sucursal '%s' tiene %s", sucursal.getNombre(), articuloMensaje));
+        }
+
+        long promocionesActivas = sucursal.getPromociones().stream().filter(Base::isAlta).count();
+        if (promocionesActivas > 0) {
+            String promocionMensaje = promocionesActivas == 1 ? "1 promoción activa" : promocionesActivas + " promociones activas";
+            throw new EntityInUseException(String.format("La sucursal '%s' tiene %s", sucursal.getNombre(), promocionMensaje));
+        }
     }
 
     @Override

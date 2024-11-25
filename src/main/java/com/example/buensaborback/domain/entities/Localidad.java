@@ -22,12 +22,12 @@ public class Localidad extends Base{
 
     private String nombre;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "id_provincia")
     private Provincia provincia;
 
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "localidad", fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "localidad")
     @Builder.Default
     @ToString.Exclude
     private Set<Domicilio> domicilios = new HashSet<>();

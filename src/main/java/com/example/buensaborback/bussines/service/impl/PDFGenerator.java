@@ -31,16 +31,14 @@ public class PDFGenerator {
 
         document.open();
 
-        // Add header with logo and company name
+        // Se agrega header
         addHeader(document);
 
-        // Add invoice title
         addInvoiceTitle(document);
 
-        // Add existing invoice details
         addInvoiceDetails(document, factura);
 
-        // Add placeholder for customer details
+        // Detalles del cliente
         addCustomerDetails(document,pedido);
 
         // Tabla de Detalles del Pedido
@@ -51,7 +49,7 @@ public class PDFGenerator {
         addRows(table, pedido);
         document.add(table);
 
-        // Add footer
+        // footer
         addFooter(writer);
 
         document.close();

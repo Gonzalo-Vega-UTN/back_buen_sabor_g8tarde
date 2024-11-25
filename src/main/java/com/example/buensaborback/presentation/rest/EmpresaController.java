@@ -47,17 +47,12 @@ public class EmpresaController {
     @PutMapping("/{id}")
     public ResponseEntity<Empresa> updateEmpresa(@PathVariable Long id, @RequestBody Empresa empresa) {
         Empresa updatedEmpresa = empresaService.updateEmpresa(id, empresa);
-        if (updatedEmpresa != null) {
-            return ResponseEntity.ok(updatedEmpresa);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(updatedEmpresa);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEmpresa(@PathVariable Long id) {
-        empresaService.deleteEmpresa(id);
-        return ResponseEntity.noContent().build();
+    @PatchMapping("/{id}")
+    public ResponseEntity<Empresa> changeStatus(@PathVariable Long id, @RequestParam("status") boolean status) {
+        return ResponseEntity.ok(empresaService.changeStatus(id, status));
     }
 
     @PostMapping("/uploads")
